@@ -1,9 +1,9 @@
 import express, { Request, Response } from "express";
 import "reflect-metadata";
 import { Contact } from "./db/Contact";
-import { DataSource } from "typeorm";
 import bodyParser from "body-parser";
 import cors from "cors";
+import PostgresDataSource from "./db/connection";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -11,27 +11,6 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 app.use(cors());
-
-//database
-const PostgresDataSource = new DataSource({
-  type: "postgres",
-  host: "localhost",
-  port: 5432,
-  username: "postgres",
-  password: "password",
-  database: "contact",
-  entities: [Contact],
-  synchronize: true,
-  logging: false,
-});
-
-PostgresDataSource.initialize()
-  .then(() => {
-    console.log("Data Source has been initialized!");
-  })
-  .catch((err: any) => {
-    console.error("Error during Data Source initialization", err);
-  });
 
 //routes
 
@@ -43,7 +22,7 @@ app.get("/v1/agenda", async (req, res) => {
   res.send(allContact);
 });
 
-app.get("/v1/agenda/:id", async (req, res) => {
+app.get("/v1/agenda/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
@@ -58,7 +37,7 @@ app.get("/v1/agenda/:id", async (req, res) => {
   }
 });
 
-app.post("/v1/agenda", async (req, res) => {
+app.post("/v1/agenda", async (req: Request, res: Response) => {
   const { name, email, phoneNumber } = req.body;
   const contact = new Contact();
   contact.name = name;
@@ -73,7 +52,7 @@ app.post("/v1/agenda", async (req, res) => {
   }
 });
 
-app.delete("/v1/agenda/:id", async (req, res) => {
+app.delete("/v1/agenda/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
@@ -89,7 +68,7 @@ app.delete("/v1/agenda/:id", async (req, res) => {
   }
 });
 
-app.put("/v1/agenda/:id", async (req, res) => {
+app.put("/v1/agenda/:id", async (req: Request, res: Response) => {
   const { name, email, phoneNumber } = req.body;
   console.log(req.body);
 
